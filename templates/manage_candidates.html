@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Candidates - Online Voting System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Add New Candidate</h2>
+    <p>Add candidates to the election ballot.</p>
+    
+    <form method="POST" action="{{ url_for('manage_candidates') }}" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="full_name">Full Name:</label>
+            <input type="text" id="full_name" name="full_name" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="party">Party Affiliation:</label>
+            <input type="text" id="party" name="party" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Candidate Description:</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn">Add Candidate</button>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Current Candidates</h2>
+    
+    {% if candidates %}
+        <div class="candidate-list">
+            {% for candidate in candidates %}
+                <div class="candidate-card">
+                    {% if candidate.image_path %}
+                        <img src="{{ url_for('static', filename='candidate_images/' + candidate.image_path) }}" alt="{{ candidate.name }}" style="max-width: 100%; height: auto;">
+                    {% endif %}
+                    <h3>{{ candidate.name }}</h3>
+                    <p><strong>Party:</strong> {{ candidate.party }}</p>
+                    <p><strong>Position:</strong> {{ candidate.position }}</p>
+                    <p>{{ candidate.bio }}</p>
+                    <div class="actions">
+                        <a href="{{ url_for('edit_candidate', candidate_id=candidate.id) }}" class="btn">Edit</a>
+                        <a href="{{ url_for('delete_candidate', candidate_id=candidate.id) }}" class="btn btn-secondary" 
+                           onclick="return confirm('Are you sure you want to delete this candidate?');">Delete</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No candidates have been added yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        
+        form.addEventListener('submit', function(event) {
+            const fullName = document.getElementById('full_name').value;
+            const party = document.getElementById('party').value;
+            const description = document.getElementById('description').value;
+            
+            if (!fullName || !party || !description) {
+                event.preventDefault();
+                alert('Please fill in all required fields');
+            }
+        });
+    });
+</script>
+{% endblock %}

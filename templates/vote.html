@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Vote{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <h2>Cast Your Vote</h2>
+        {% if has_voted %}
+            <div class="flash-message info">
+                You have already cast your vote in this election.
+            </div>
+        {% else %}
+            <form action="{{ url_for('cast_vote') }}" method="post">
+                <div class="candidate-list">
+                    {% for candidate in candidates %}
+                        <div class="candidate-card">
+                            {% if candidate.image_path %}
+                                <img src="{{ url_for('static', filename='candidate_images/' + candidate.image_path) }}" alt="{{ candidate.name }}" style="max-width: 100%; height: auto;">
+                            {% endif %}
+                            <h3>{{ candidate.name }}</h3>
+                            <p><strong>Party:</strong> {{ candidate.party }}</p>
+                            <p><strong>Position:</strong> {{ candidate.position }}</p>
+                            <p>{{ candidate.bio }}</p>
+                            <div class="form-group">
+                                <input type="radio" id="candidate{{ candidate.id }}" name="candidate_id" value="{{ candidate.id }}" required>
+                                <label for="candidate{{ candidate.id }}">Select</label>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p>No candidates available for voting at this time.</p>
+                    {% endfor %}
+                </div>
+                {% if candidates %}
+                    <div class="form-group">
+                        <button type="submit" class="btn">Submit Vote</button>
+                    </div>
+                {% endif %}
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}

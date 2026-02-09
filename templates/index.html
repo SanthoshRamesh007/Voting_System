@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Online Voting System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Welcome to the Online Voting System</h2>
+    <p>This platform allows registered voters to cast their votes securely in elections.</p>
+    
+    {% if session.logged_in %}
+        <h3>Hello, {{ session.voter_name }}!</h3>
+        <p>You are logged in and can now participate in the voting process.</p>
+        <div>
+            <a href="{{ url_for('vote') }}" class="btn">Cast Your Vote</a>
+            <a href="{{ url_for('results') }}" class="btn btn-secondary">View Results</a>
+            {% if session.is_admin %}
+                <a href="{{ url_for('manage_candidates') }}" class="btn">Manage Candidates</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <p>To participate in the voting process, please register or login.</p>
+        <div>
+            <a href="{{ url_for('register') }}" class="btn">Register as a Voter</a>
+            <a href="{{ url_for('login') }}" class="btn">Login</a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>About This System</h2>
+    <p>This online voting system is designed to provide a secure and easy way for citizens to participate in democratic processes. Our system ensures:</p>
+    <ul>
+        <li>One vote per registered voter</li>
+        <li>Secure authentication</li>
+        <li>Transparent results</li>
+        <li>Easy-to-use interface</li>
+    </ul>
+</div>
+{% endblock %}

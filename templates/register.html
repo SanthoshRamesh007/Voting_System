@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Online Voting System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Register as a Voter</h2>
+    <form method="POST" action="{{ url_for('register') }}" id="registration-form">
+        <div class="form-group">
+            <label for="full_name">Full Name:</label>
+            <input type="text" id="full_name" name="full_name" required>
+            <small class="form-text" id="name-feedback"></small>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" required>
+            <small class="form-text" id="email-feedback"></small>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required minlength="8">
+            <small class="form-text" id="password-feedback">Must be at least 8 characters</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password" required minlength="8">
+            <small class="form-text" id="confirm-feedback"></small>
+        </div>
+        
+        <button type="submit" class="btn" id="register-button">Register</button>
+    </form>
+    
+    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('registration-form');
+        const fullNameInput = document.getElementById('full_name');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        
+        const nameFeedback = document.getElementById('name-feedback');
+        const emailFeedback = document.getElementById('email-feedback');
+        const passwordFeedback = document.getElementById('password-feedback');
+        const confirmFeedback = document.getElementById('confirm-feedback');
+        
+        // Style for feedback elements
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                .form-text {
+                    font-size: 0.8rem;
+                    margin-top: 4px;
+                }
+                .invalid-feedback {
+                    color: #dc3545;
+                }
+                .valid-feedback {
+                    color: #28a745;
+                }
+                .is-invalid {
+                    border-color: #dc3545 !important;
+                }
+                .is-valid {
+                    border-color: #28a745 !important;
+                }
+            </style>
+        `);
+        
+        // Validate full name
+        fullNameInput.addEventListener('blur', function() {
+            if (this.value.trim() === '') {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+                nameFeedback.textContent = 'Name is required';
+                nameFeedback.className = 'form-text invalid-feedback';
+            } else if (this.value.trim().length < 2) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+                nameFeedback.textContent = 'Name is too short';
+                nameFeedback.className = 'form-text invalid-feedback';
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                nameFeedback.textContent = 'Looks good!';
+                nameFeedback.className = 'form-text valid-feedback';
+            }
+        });
+        
+        // Validate email
+        emailInput.addEventListener('blur', function() {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (this.value.trim() === '') {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+                emailFeedback.textContent = 'Email is required';
+                emailFeedback.className = 'form-text invalid-feedback';
+            } else if (!emailRegex.test(this.value)) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+                emailFeedback.textContent = 'Please enter a valid email address';
+                emailFeedback.className = 'form-text invalid-feedback';
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                emailFeedback.textContent = 'Looks good!';
+                emailFeedback.className = 'form-text valid-feedback';
+            }
+        });
+        
+        // Validate password
+        passwordInput.addEventListener('input', function() {
+            if (this.value.length < 8) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+                passwordFeedback.textContent = 'Password must be at least 8 characters';
+                passwordFeedback.className = 'form-text invalid-feedback';
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                passwordFeedback.textContent = 'Password strength: ' + 
+                    (this.value.match(/[A-Z]/) && this.value.match(/[0-9]/) && this.value.match(/[^A-Za-z0-9]/) ? 
+                    'Strong' : this.value.match(/[A-Z]/) || this.value.match(/[0-9]/) ? 
+                    'Medium' : 'Weak');
+                passwordFeedback.className = 'form-text valid-feedback';
+            }
+            
+            // Check password confirmation if it has value
+            if (confirmPasswordInput.value) {
+                if (this.value !== confirmPasswordInput.value) {
+                    confirmPasswordInput.classList.add('is-invalid');
+                    confirmPasswordInput.classList.remove('is-valid');
+                    confirmFeedback.textContent = 'Passwords do not match';
+                    confirmFeedback.className = 'form-text invalid-feedback';
+                } else {
+                    confirmPasswordInput.classList.remove('is-invalid');
+                    confirmPasswordInput.classList.add('is-valid');
+                    confirmFeedback.textContent = 'Passwords match!';
+                    confirmFeedback.className = 'form-text valid-feedback';
+                }
+            }
+        });
+        
+        // Validate password confirmation
+        confirmPasswordInput.addEventListener('input', function() {
+            if (this.value !== passwordInput.value) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+                confirmFeedback.textContent = 'Passwords do not match';
+                confirmFeedback.className = 'form-text invalid-feedback';
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                confirmFeedback.textContent = 'Passwords match!';
+                confirmFeedback.className = 'form-text valid-feedback';
+            }
+        });
+        
+        // Form submission validation
+        form.addEventListener('submit', function(event) {
+            let isValid = true;
+            
+            // Trigger validation for all fields
+            fullNameInput.dispatchEvent(new Event('blur'));
+            emailInput.dispatchEvent(new Event('blur'));
+            passwordInput.dispatchEvent(new Event('input'));
+            confirmPasswordInput.dispatchEvent(new Event('input'));
+            
+            // Check if any field is invalid
+            if (document.querySelectorAll('.is-invalid').length > 0) {
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                event.preventDefault();
+                alert('Please fix the errors in the form before submitting.');
+            }
+        });
+    });
+</script>
+{% endblock %}

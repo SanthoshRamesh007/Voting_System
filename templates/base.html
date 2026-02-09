@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Online Voting System{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --primary-light: #e3f2fd;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --info-color: #3498db;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-gray: #f4f4f9;
+            --dark-gray: #7f8c8d;
+            --white: #ffffff;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: var(--secondary-color);
+        }
+        
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+            padding: 1.5em 0;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            letter-spacing: 0.5px;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: var(--secondary-color);
+            padding: 0.7em 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 7px 14px;
+            border-radius: 4px;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .flash-message {
+            padding: 12px 18px;
+            margin: 15px 0;
+            border-radius: 6px;
+            background-color: #dff0d8;
+            border-left: 4px solid var(--success-color);
+            color: #3c763d;
+            position: relative;
+            animation: fadeIn 0.5s ease;
+            box-shadow: var(--box-shadow);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .flash-message.error {
+            background-color: #fde8e8;
+            border-left-color: var(--danger-color);
+            color: #a94442;
+        }
+        
+        .flash-message.info {
+            background-color: #e3f2fd;
+            border-left-color: var(--info-color);
+            color: #31708f;
+        }
+        
+        .flash-message.warning {
+            background-color: #fef9e7;
+            border-left-color: var(--warning-color);
+            color: #8a6d3b;
+        }
+        
+        .flash-message-close {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+        
+        .flash-message-close:hover {
+            opacity: 1;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            
+            nav {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav a {
+                margin: 5px 0;
+                width: 90%;
+                text-align: center;
+            }
+            
+            .candidate-list {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 25px 0;
+            background-color: var(--secondary-color);
+            color: var(--white);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            margin: 25px 0;
+            transition: var(--transition);
+            border-top: 4px solid var(--primary-color);
+        }
+        
+        .card:hover {
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+        
+        .card h2 {
+            color: var(--primary-dark);
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            transition: var(--transition);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background-color: var(--dark-gray);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #6c7a89;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            background-color: white;
+        }
+        
+        .candidate-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .candidate-card {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: white;
+            transition: var(--transition);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .candidate-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+        }
+        
+        .candidate-card img {
+            border-radius: 5px;
+            margin-bottom: 15px;
+            object-fit: cover;
+            height: 200px;
+            width: 100%;
+        }
+        
+        .candidate-card h3 {
+            color: var(--primary-dark);
+            margin-top: 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        
+        .candidate-actions {
+            margin-top: auto;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: var(--box-shadow);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .results-table th, 
+        .results-table td {
+            padding: 14px 20px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        
+        .results-table th {
+            background-color: var(--primary-light);
+            color: var(--secondary-color);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .results-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .results-table tr:hover {
+            background-color: #f0f7fb;
+        }
+        
+        .results-table td:last-child, 
+        .results-table th:last-child {
+            text-align: right;
+        }
+        
+        .page-title {
+            font-size: 2.2em;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            color: var(--secondary-color);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* File input styling */
+        input[type="file"] {
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            width: 100%;
+        }
+        
+        input[type="file"]::-webkit-file-upload-button {
+            background: var(--primary-color);
+            color: white;
+            border: 0;
+            padding: 10px 15px;
+            margin-right: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        input[type="file"]::-webkit-file-upload-button:hover {
+            background: var(--primary-dark);
+        }
+        
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Online Voting System</h1>
+        </div>
+    </header>
+    
+    <nav>
+        <a href="{{ url_for('index') }}" {% if request.path == url_for('index') %}class="active"{% endif %}>Home</a>
+        {% if session.logged_in %}
+            <a href="{{ url_for('vote') }}" {% if request.path == url_for('vote') %}class="active"{% endif %}>Vote</a>
+            <a href="{{ url_for('results') }}" {% if request.path == url_for('results') %}class="active"{% endif %}>Results</a>
+            {% if session.is_admin %}
+                <a href="{{ url_for('candidate_register') }}" {% if request.path == url_for('candidate_register') %}class="active"{% endif %}>Register Candidates</a>
+                <a href="{{ url_for('manage_candidates') }}" {% if request.path == url_for('manage_candidates') %}class="active"{% endif %}>Manage Candidates</a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" {% if request.path == url_for('login') %}class="active"{% endif %}>Login</a>
+            <a href="{{ url_for('register') }}" {% if request.path == url_for('register') %}class="active"{% endif %}>Register</a>
+            <a href="{{ url_for('results') }}" {% if request.path == url_for('results') %}class="active"{% endif %}>Results</a>
+        {% endif %}
+    </nav>
+    
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for category, message in messages %}
+                        <li class="flash-message {% if category %}{{ category }}{% endif %}">
+                            {{ message }}
+                            <span class="flash-message-close" onclick="this.parentElement.style.display='none'">×</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Online Voting System. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    {% block scripts %}{% endblock %}
+    <script>
+        // Auto-hide flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            if (flashMessages.length > 0) {
+                setTimeout(function() {
+                    flashMessages.forEach(function(message) {
+                        message.style.opacity = '0';
+                        message.style.transition = 'opacity 1s ease';
+                        setTimeout(function() {
+                            message.style.display = 'none';
+                        }, 1000);
+                    });
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
